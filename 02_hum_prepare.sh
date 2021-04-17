@@ -31,5 +31,5 @@ else
 ' 2.csv >> hum.sql
 echo "insert hum into DB"
 echo $ids
-#export PGPASSWORD="der_parol"" psql -h localhost -U postgres -d pseed_db -f hum.sql >hum.log
+#export PGPASSWORD="der_parol" psql -h localhost -U postgres -d pseed_db -f hum.sql >hum.log
 done
