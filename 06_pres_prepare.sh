@@ -21,9 +21,9 @@ if ( dat == dat_prev)
 
 else 
  {
-printf "select meteo_insert(\x27UPM000%s\x27, \x27%s\x27, \x27pres\x27, %.0f);\n ",id_stat,dat_prev,avr/num_avr;
-    avr=$2; 
-    num_avr=1; 
+ printf "select meteo_insert(\x27UPM000%s\x27, \x27%s\x27, \x27pres\x27, %.0f);\n ",id_stat,dat_prev,avr/num_avr;
+ avr=$2; 
+ num_avr=1; 
  dat_prev=dat;
  }
 
@@ -31,6 +31,7 @@ printf "select meteo_insert(\x27UPM000%s\x27, \x27%s\x27, \x27pres\x27, %.0f);\n
 ' 2.csv >> pres.sql
 echo "insert pres into DB"
 echo $ids
-#export PGPASSWORD="der_parol" && psql -h localhost -U postgres -d pseed_db -f pres.sql >pres.log 
-date
 done
+date
+#psql -U $PGUSER -h $PGHOST -d $PGDATABASE -f pres.sql > pres.log
+date

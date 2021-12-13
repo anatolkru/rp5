@@ -31,6 +31,7 @@ printf "select meteo_insert(\x27UPM000%s\x27, \x27%s\x27, \x27wind\x27, %.1f);\n
 ' 2.csv >> wind.sql
 echo "insert wind into DB"
 echo $ids
-#export PGPASSWORD="der_parol" && psql -h localhost -U postgres -d pseed_db -f wind.sql >wind.log 
-date
 done
+date
+#psql -U $PGUSER -h $PGHOST -d $PGDATABASE -f wind.sql > wind.log
+date

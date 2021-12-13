@@ -6,7 +6,7 @@ dat1=`sed -n '1 s/"\([0-9][0-9]\.[0-9][0-9]\.[0-9][0-9][0-9][0-9]\) .*/\1/p' ./$
 echo $dat1
 awk ' BEGIN { FS=";"}
 gsub(/[0-9][0-9]:[0-9][0-9]/,"") {print $1 $6};
-' $ids |sed 's/"//g'>2.csv
+' $ids |sed 's/"//g'|grep -v '^..\...\..... *$'>2.csv
 
 awk ' BEGIN { FS=" "; avr=0;id_stat='$ids';dat_prev="'$dat1'";}
 { 
@@ -29,7 +29,9 @@ else
 
 }
 ' 2.csv >> hum.sql
-echo "insert hum into DB"
 echo $ids
-#export PGPASSWORD="der_parol" psql -h localhost -U postgres -d pseed_db -f hum.sql >hum.log
 done
+date
+echo "insert hum into DB"
+#psql -U $PGUSER -h $PGHOST -d $PGDATABASE -f hum.sql >hum.log
+date

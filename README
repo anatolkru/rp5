@@ -1,0 +1,130 @@
+Скрипты работают с выкачанными архивами rp5.ru
+
+Перед работой скриптов необходимо инициализировать переменные окружения
+-----------------------------------------------------------------------
+$ . ~/evn.sh
+export PGUSER=''
+export PGPASSWD=''
+export PGDATABASE=''
+export PGHOST=''
+
+
+Порядок запуска скриптов.
+------------------------
+00_prepare.sh
+Распаковывает выложенные архивы, переименовывает и удаляет первые строки с заголовками.
+Удаляет ";" из некоторых столбцов.
+
+01_tavg_prepare.sh
+В цикле обрабатывает найденные файлы (шаблон поиска XXXXX - все цифры).
+При этом создаются промежуточные файлы 2.csv, 3.csv.
+Готовит файл tavg.sql, затем вносит подготовленный файл в базу данных.
+Результаты сохраняются в файл tavg.log.
+
+02_...
+Последующие файлы отвечают за другие метеопараметры в базе данных.
+
+
+Для работы sql-файла в базе данных созданы соотв. функции обработки:
+--------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.meteo_insert(
+    character varying,
+    date,
+    character varying,
+    numeric)
+  RETURNS integer AS
+$BODY$
+DECLARE
+name_param ALIAS FOR $3;
+value_param ALIAS FOR $4;
+BEGIN
+--tmax
+if (name_param ='tmax') then 
+ UPDATE meteo_data SET tmax=value_param WHERE station_id=$1 AND date_exec=$2;
+ if NOT FOUND then
+  INSERT INTO meteo_data(station_id,date_exec,tmax) 
+  VALUES ($1,$2,value_param);
+ end if;
+end if;
+
+--tmin
+if (name_param ='tmin') then 
+ UPDATE meteo_data SET tmin=value_param WHERE station_id=$1 AND date_exec=$2;
+ if NOT FOUND then
+  INSERT INTO meteo_data(station_id,date_exec,tmin) 
+  VALUES ($1,$2,value_param);
+ end if;
+end if;
+
+--tavg
+if (name_param ='tavg') then 
+ UPDATE meteo_data SET tavg=value_param WHERE station_id=$1 AND date_exec=$2;
+ if NOT FOUND then
+  INSERT INTO meteo_data(station_id,date_exec,tavg) 
+  VALUES ($1,$2,value_param);
+ end if;
+end if;
+
+--wind
+if (name_param ='wind') then 
+ UPDATE meteo_data SET wind=value_param WHERE station_id=$1 AND date_exec=$2;
+ if NOT FOUND then
+  INSERT INTO meteo_data(station_id,date_exec,wind) 
+  VALUES ($1,$2,value_param);
+ end if;
+end if;
+
+--prcp
+if (name_param ='prcp') then 
+ UPDATE meteo_data SET prcp=value_param WHERE station_id=$1 AND date_exec=$2;
+ if NOT FOUND then
+  INSERT INTO meteo_data(station_id,date_exec,prcp) 
+  VALUES ($1,$2,value_param);
+ end if;
+end if;
+
+--pres
+if (name_param ='pres') then 
+ UPDATE meteo_data SET pres=value_param WHERE station_id=$1 AND date_exec=$2;
+ if NOT FOUND then
+  INSERT INTO meteo_data(station_id,date_exec,pres) 
+  VALUES ($1,$2,value_param);
+ end if;
+end if;
+
+--hum
+if (name_param ='hum') then 
+ UPDATE meteo_data SET hum=value_param WHERE station_id=$1 AND date_exec=$2;
+ if NOT FOUND then
+  INSERT INTO meteo_data(station_id,date_exec,hum) 
+  VALUES ($1,$2,value_param);
+ end if;
+end if;
+
+--snwd
+if (name_param ='snwd') then 
+ UPDATE meteo_data SET snwd=value_param WHERE station_id=$1 AND date_exec=$2;
+ if NOT FOUND then
+  INSERT INTO meteo_data(station_id,date_exec,snwd) 
+  VALUES ($1,$2,value_param);
+ end if;
+end if;
+
+--snow
+if (name_param ='snow') then 
+ UPDATE meteo_data SET snow=value_param WHERE station_id=$1 AND date_exec=$2;
+ if NOT FOUND then
+  INSERT INTO meteo_data(station_id,date_exec,snow) 
+  VALUES ($1,$2,value_param);
+ end if;
+end if;
+RETURN 0;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION public.meteo_insert(character varying, date, character varying, numeric)
+  OWNER TO pseed;
+GRANT EXECUTE ON FUNCTION public.meteo_insert(character varying, date, character varying, numeric) TO public;
+GRANT EXECUTE ON FUNCTION public.meteo_insert(character varying, date, character varying, numeric) TO pseed;
+

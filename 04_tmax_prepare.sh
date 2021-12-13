@@ -7,31 +7,32 @@ echo $dat1
 awk ' BEGIN { FS=";"}
 gsub(/[0-9][0-9]:[0-9][0-9]/,"") {print $1 $2};
 ' $ids |sed 's/"//g'>2.csv
+sed 's/\.\(.\)$/\1/g' 2.csv > 3.csv
 
-awk ' BEGIN { FS=" ";max=-1000;id_stat='$ids';dat_prev="'$dat1'";}
+awk ' BEGIN { FS=" ";max=$2;id_stat='$ids';dat_prev="'$dat1'";}
 { 
-dat=$1;
+dat=$1
+val=$2
 if ( dat == dat_prev)
  {  
-   if (max<$2)
+   if ( max<val )
     {
-     max = $2;
-     #printf "# %.1f\n", max;
+     max = val;
     }
  dat_prev=dat;
  }
-
 else 
  {
-printf "select meteo_insert(\x27UPM000%s\x27, \x27%s\x27, \x27tmax\x27, %.0f);\n ",id_stat,dat_prev,max*10;
+ printf "select meteo_insert(\x27UPM000%s\x27, \x27%s\x27, \x27tmax\x27, %.0f);\n ",id_stat,dat_prev,max;
  dat_prev=dat;
- max=-1000
+ max=val
  }
-
+ #print ("dat=", $1," val=",val," max=", max, " -----",$2)
 }
-' 2.csv >> tmax.sql
+' 3.csv >> tmax.sql
 echo "insert tmax into DB"
 echo $ids
-#export PGPASSWORD="der_parol" && psql -h localhost -U postgres -d pseed_db -f tavg.sql >tavg.log 
-date
 done
+date
+#psql -U $PGUSER -h $PGHOST -d $PGDATABASE -f tmax.sql > tmax.log
+date
