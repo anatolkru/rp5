@@ -23,7 +23,9 @@ if ( dat == dat_prev)
  }
 else 
  {
- printf "select meteo_insert(\x27UPM000%s\x27, \x27%s\x27, \x27tmax\x27, %.0f);\n ",id_stat,dat_prev,max;
+  if ( dat_prev !="" ) {
+    printf "select meteo_insert(\x27UPM000%s\x27, \x27%s\x27, \x27tmax\x27, %.0f);\n ",id_stat,dat_prev,max;
+  }
  dat_prev=dat;
  max=val
  }

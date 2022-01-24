@@ -7,7 +7,8 @@ echo $dat1
 awk ' BEGIN { FS=";"}
 gsub(/[0-9][0-9]:[0-9][0-9]/,"") {print $1 $2};
 ' $ids |sed 's/"//g'|grep -v '^..\...\..... *$'>2.csv
- 
+sed 's/\.\(.\)$/\1/g' 2.csv > 3.csv
+
 awk ' BEGIN { FS=" "; avr=0;id_stat='$ids';dat_prev="'$dat1'";}
 { 
 dat=$1;
@@ -17,17 +18,18 @@ if ( dat == dat_prev)
  num_avr++;
  dat_prev=dat;
  }
-
 else 
  {
- printf "select meteo_insert(\x27UPM000%s\x27, \x27%s\x27, \x27tavg\x27, %.0f);\n ",id_stat,dat_prev,avr/num_avr*10;
+   if ( dat_prev !="" ) {
+     printf "select meteo_insert(\x27UPM000%s\x27, \x27%s\x27, \x27tavg\x27, %.0f);\n ",id_stat,dat_prev,avr/num_avr;
+   }
  avr=$2; 
  num_avr=1; 
  dat_prev=dat;
  }
 
 }
-' 2.csv >> tavg.sql
+' 3.csv >> tavg.sql
 echo $ids
 done
 date

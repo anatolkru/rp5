@@ -21,7 +21,9 @@ if ( dat == dat_prev)
 
 else 
  {
- printf "select meteo_insert(\x27UPM000%s\x27, \x27%s\x27, \x27hum\x27, %.0f);\n ",id_stat,dat_prev,avr/num_avr;
+  if ( dat_prev !="" ) {
+    printf "select meteo_insert(\x27UPM000%s\x27, \x27%s\x27, \x27hum\x27, %.0f);\n ",id_stat,dat_prev,avr/num_avr;
+  }
     avr=$2; 
     num_avr=1; 
  dat_prev=dat;
